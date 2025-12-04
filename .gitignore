@@ -1,0 +1,8 @@
+bin/
+*.class
+*.db
+*.log
+.vscode/
+.idea/
+*.iml
+.DS_Store
