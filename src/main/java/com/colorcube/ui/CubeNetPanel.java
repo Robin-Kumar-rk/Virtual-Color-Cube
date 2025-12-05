@@ -27,7 +27,7 @@ public class CubeNetPanel extends JPanel {
         this.model = model;
         this.faceKeys = faceKeys;
         this.onKeyChange = onKeyChange;
-        setPreferredSize(new Dimension(400, 300));
+        setPreferredSize(new Dimension(400, 450));
         setBackground(Color.LIGHT_GRAY);
 
         addMouseListener(new MouseAdapter() {
@@ -44,7 +44,7 @@ public class CubeNetPanel extends JPanel {
         checkCenterClick(x, y, Face.L, 0, 3);
         checkCenterClick(x, y, Face.F, 3, 3);
         checkCenterClick(x, y, Face.R, 6, 3);
-        checkCenterClick(x, y, Face.B, 9, 3);
+        checkCenterClick(x, y, Face.B, 3, 9);
         checkCenterClick(x, y, Face.D, 3, 6);
     }
 
@@ -80,7 +80,7 @@ public class CubeNetPanel extends JPanel {
         drawFace(g, Face.L, 0, 3);
         drawFace(g, Face.F, 3, 3);
         drawFace(g, Face.R, 6, 3);
-        drawFace(g, Face.B, 9, 3);
+        drawFace(g, Face.B, 3, 9);
         drawFace(g, Face.D, 3, 6);
     }
 

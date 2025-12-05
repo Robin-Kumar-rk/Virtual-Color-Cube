@@ -44,7 +44,7 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         super("3x3 Color Cube - Virtual Practice");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 700); // Increased width for saved list
+        setSize(1200, 600); // Reduced height to prevent taskbar overlap
         setLocationRelativeTo(null);
 
         model = new CubeModel();
@@ -71,7 +71,7 @@ public class MainFrame extends JFrame {
         panelNet = new CubeNetPanel(model, faceKeys, this::updateKeyBinding);
 
         JSplitPane innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel3D, panelNet);
-        innerSplitPane.setResizeWeight(0.6);
+        innerSplitPane.setResizeWeight(0.625);
 
         // Right: Saved Progress
         JPanel rightPanel = new JPanel(new BorderLayout());
@@ -131,8 +131,18 @@ public class MainFrame extends JFrame {
 
         // Outer SplitPane (Inner + Right Panel)
         JSplitPane outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, innerSplitPane, rightPanel);
-        outerSplitPane.setResizeWeight(0.85); // Give most space to the cube view
+        outerSplitPane.setResizeWeight(0.8); // Give most space to the cube view
         add(outerSplitPane, BorderLayout.CENTER);
+
+        // Set initial divider locations for 50% / 30% / 20% split of 1200px width
+        // Inner split: 600px (50%) for 3D, rest for Net
+        // Outer split: 960px (80%) for Inner, 240px (20%) for Saved
+        // Note: These might need to be wrapped in invokeLater if not realized,
+        // but setting proportional location or int location often works if size is
+        // known.
+        // Let's try setting them directly.
+        innerSplitPane.setDividerLocation(600);
+        outerSplitPane.setDividerLocation(960);
 
         // Top: Toolbar
         JToolBar toolbar = new JToolBar();
