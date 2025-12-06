@@ -5,24 +5,28 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultListModel;
+import javax.swing.BorderFactory;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+
+import java.awt.Color;
 
 import com.colorcube.core.Scrambler;
 import com.colorcube.model.CubeModel;
@@ -36,8 +40,11 @@ public class MainFrame extends JFrame {
     private CubeNetPanel panelNet;
     private DBManager dbManager;
 
-    private DefaultListModel<DBManager.SavedSession> savedListModel;
-    private JList<DBManager.SavedSession> savedList;
+    private JPanel savedItemsPanel;
+    private JSplitPane innerSplitPane;
+    private JSplitPane outerSplitPane;
+    private JPanel rightPanel;
+    private boolean isSavedPanelVisible = false;
 
     private Map<Face, Character> faceKeys;
 
@@ -51,13 +58,16 @@ public class MainFrame extends JFrame {
         dbManager = new DBManager();
 
         // Initialize default key bindings
-        faceKeys = new HashMap<>();
-        faceKeys.put(Face.U, 'u');
-        faceKeys.put(Face.D, 'd');
-        faceKeys.put(Face.L, 'l');
-        faceKeys.put(Face.R, 'r');
-        faceKeys.put(Face.F, 'f');
-        faceKeys.put(Face.B, 'b');
+        // Initialize key bindings from DB or defaults
+        faceKeys = dbManager.loadKeyBindings();
+
+        // Ensure all faces have a key
+        faceKeys.putIfAbsent(Face.U, 'u');
+        faceKeys.putIfAbsent(Face.D, 'd');
+        faceKeys.putIfAbsent(Face.L, 'l');
+        faceKeys.putIfAbsent(Face.R, 'r');
+        faceKeys.putIfAbsent(Face.F, 'f');
+        faceKeys.putIfAbsent(Face.B, 'b');
 
         initUI();
         refreshSavedList();
@@ -70,79 +80,34 @@ public class MainFrame extends JFrame {
         panel3D = new Cube3DPanel(model);
         panelNet = new CubeNetPanel(model, faceKeys, this::updateKeyBinding);
 
-        JSplitPane innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel3D, panelNet);
-        innerSplitPane.setResizeWeight(0.625);
+        innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel3D, panelNet);
+        innerSplitPane.setResizeWeight(0.6); // 60/40 default when saved pane is hidden
 
         // Right: Saved Progress
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        // rightPanel.setPreferredSize(new Dimension(200, 0)); // Removed fixed size
-        // preference
+        // Right: Saved Progress
+        rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(new JLabel("Saved Progress"), BorderLayout.NORTH);
 
-        savedListModel = new DefaultListModel<>();
-        savedList = new JList<>(savedListModel) {
-            @Override
-            protected void processMouseEvent(java.awt.event.MouseEvent e) {
-                if (e.getID() == java.awt.event.MouseEvent.MOUSE_PRESSED &&
-                        javax.swing.SwingUtilities.isLeftMouseButton(e)) {
+        savedItemsPanel = new JPanel();
+        savedItemsPanel.setLayout(new BoxLayout(savedItemsPanel, BoxLayout.Y_AXIS));
 
-                    if (!hasFocus()) {
-                        requestFocusInWindow();
-                    }
+        // Wrapper to align items to the top
+        JPanel topAlignedWrapper = new JPanel(new BorderLayout());
+        topAlignedWrapper.add(savedItemsPanel, BorderLayout.NORTH);
 
-                    int index = locationToIndex(e.getPoint());
-                    if (index != -1) {
-                        java.awt.Rectangle bounds = getCellBounds(index, index);
-                        if (bounds != null && bounds.contains(e.getPoint())) {
-                            // Clicked on an item
-                            if (isSelectedIndex(index)) {
-                                clearSelection();
-                            } else {
-                                setSelectedIndex(index);
-                            }
-                        } else {
-                            // Clicked in white space (but within component bounds)
-                            clearSelection();
-                        }
-                    } else {
-                        clearSelection();
-                    }
-
-                    // Consume the event and DO NOT call super to prevent default UI handling
-                    e.consume();
-                    return;
-                }
-                super.processMouseEvent(e);
-            }
-        };
-        savedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        rightPanel.add(new JScrollPane(savedList), BorderLayout.CENTER);
-
-        JPanel loadPanel = new JPanel(new FlowLayout());
-        JButton btnLoad = new JButton("Load");
-        btnLoad.addActionListener(e -> doLoad());
-        loadPanel.add(btnLoad);
-
-        JButton btnDelete = new JButton("Delete");
-        btnDelete.addActionListener(e -> doDelete());
-        loadPanel.add(btnDelete);
-
-        rightPanel.add(loadPanel, BorderLayout.SOUTH);
+        JScrollPane scrollPane = new JScrollPane(topAlignedWrapper);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        rightPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Outer SplitPane (Inner + Right Panel)
-        JSplitPane outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, innerSplitPane, rightPanel);
-        outerSplitPane.setResizeWeight(0.8); // Give most space to the cube view
+        outerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, innerSplitPane, null); // Start hidden
+        outerSplitPane.setResizeWeight(1.0); // Give all space to inner pane
         add(outerSplitPane, BorderLayout.CENTER);
 
-        // Set initial divider locations for 50% / 30% / 20% split of 1200px width
-        // Inner split: 600px (50%) for 3D, rest for Net
-        // Outer split: 960px (80%) for Inner, 240px (20%) for Saved
-        // Note: These might need to be wrapped in invokeLater if not realized,
-        // but setting proportional location or int location often works if size is
-        // known.
-        // Let's try setting them directly.
-        innerSplitPane.setDividerLocation(600);
-        outerSplitPane.setDividerLocation(960);
+        // Set initial divider locations
+        SwingUtilities.invokeLater(() -> {
+            innerSplitPane.setDividerLocation(0.6); // 60% of width
+        });
 
         // Top: Toolbar
         JToolBar toolbar = new JToolBar();
@@ -171,10 +136,37 @@ public class MainFrame extends JFrame {
         JButton btnHelp = createStyledButton("Help", e -> showHelp());
         toolbar.add(btnHelp);
 
+        // Add glue to push next component to right
+        toolbar.add(Box.createHorizontalGlue());
+
+        JButton btnToggleList = createStyledButton("Saved Progress", e -> toggleSavedPanel());
+        toolbar.add(btnToggleList);
+
         add(toolbar, BorderLayout.NORTH);
 
         // Key Bindings
         setupKeyBindings();
+    }
+
+    private void toggleSavedPanel() {
+        isSavedPanelVisible = !isSavedPanelVisible;
+        if (isSavedPanelVisible) {
+            outerSplitPane.setRightComponent(rightPanel);
+            outerSplitPane.setResizeWeight(0.8);
+            // 80% / 20%
+            outerSplitPane.setDividerLocation(0.8);
+            // 50% of total (which is 62.5% of 80%) for 3D
+            innerSplitPane.setResizeWeight(0.625);
+            innerSplitPane.setDividerLocation(0.625);
+        } else {
+            outerSplitPane.setRightComponent(null);
+            outerSplitPane.setResizeWeight(1.0);
+            // 60% / 40%
+            innerSplitPane.setResizeWeight(0.6);
+            innerSplitPane.setDividerLocation(0.6);
+        }
+        revalidate();
+        repaint();
     }
 
     private void showHelp() {
@@ -199,6 +191,7 @@ public class MainFrame extends JFrame {
         JButton btn = new JButton(text);
         btn.addActionListener(action);
         btn.setFocusPainted(false);
+        btn.setFocusable(false); // Fix: Prevent button from retaining focus (blue background)
         btn.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
         btn.setMargin(new java.awt.Insets(5, 10, 5, 10));
         return btn;
@@ -216,6 +209,7 @@ public class MainFrame extends JFrame {
 
         // Update map
         faceKeys.put(face, newKey);
+        dbManager.saveKeyBinding(face, newKey);
 
         // Add new binding
         bindFaceKey(content, face, newKey);
@@ -243,39 +237,73 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void doLoad() {
+    private void doLoad(DBManager.SavedSession session) {
         if (panel3D.isAnimating())
             return;
-        DBManager.SavedSession selected = savedList.getSelectedValue();
-        if (selected != null) {
-            model.setFacelets(selected.faceletString);
+        if (session != null) {
+            model.setFacelets(session.faceletString);
             // In a real app we would restore move history too
             refreshViews();
         }
     }
 
-    private void doDelete() {
+    private void doDelete(DBManager.SavedSession session) {
         if (panel3D.isAnimating())
             return;
-        DBManager.SavedSession selected = savedList.getSelectedValue();
-        if (selected != null) {
+        if (session != null) {
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Are you sure you want to delete session '" + selected.name + "'?",
+                    "Are you sure you want to delete session '" + session.name + "'?",
                     "Confirm Delete", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                dbManager.deleteProgress(selected.id);
+                dbManager.deleteProgress(session.id);
                 refreshSavedList();
             }
         }
     }
 
     private void refreshSavedList() {
-        savedListModel.clear();
+        savedItemsPanel.removeAll();
         List<DBManager.SavedSession> sessions = dbManager.loadAllProgress();
         for (DBManager.SavedSession s : sessions) {
-            savedListModel.addElement(s);
+            JPanel row = new JPanel(new BorderLayout());
+            row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            row.setBackground(Color.WHITE);
+            // Increased height to accommodate name + buttons stacked
+            row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
+            row.setPreferredSize(new Dimension(300, 65));
+
+            JLabel lblName = new JLabel("  " + s.toString());
+            lblName.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+            // Name at top
+            row.add(lblName, BorderLayout.NORTH);
+
+            // Buttons below, left aligned
+            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+            btnPanel.setOpaque(false);
+
+            JButton btnRestore = new JButton("Load");
+            btnRestore.setToolTipText("Load this session");
+            btnRestore.setMargin(new java.awt.Insets(2, 8, 2, 8));
+            btnRestore.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 11));
+            btnRestore.addActionListener(e -> doLoad(s));
+
+            JButton btnDelete = new JButton("Delete");
+            btnDelete.setToolTipText("Delete this session");
+            btnDelete.setMargin(new java.awt.Insets(2, 8, 2, 8));
+            btnDelete.setForeground(Color.RED);
+            btnDelete.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
+            btnDelete.addActionListener(e -> doDelete(s));
+
+            btnPanel.add(btnRestore);
+            btnPanel.add(btnDelete);
+
+            row.add(btnPanel, BorderLayout.CENTER);
+
+            savedItemsPanel.add(row);
         }
+        savedItemsPanel.revalidate();
+        savedItemsPanel.repaint();
     }
 
     private void refreshViews() {

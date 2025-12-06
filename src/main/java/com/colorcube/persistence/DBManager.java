@@ -117,4 +117,46 @@ public class DBManager {
             return name + " (" + createdAt + ")";
         }
     }
+
+    public void saveKeyBinding(com.colorcube.model.Face face, char key) {
+        String k = "KEY_" + face.name();
+        String v = String.valueOf(key);
+        String sql = "INSERT OR REPLACE INTO metadata(key, value) VALUES(?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, k);
+            pstmt.setString(2, v);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public java.util.Map<com.colorcube.model.Face, Character> loadKeyBindings() {
+        java.util.Map<com.colorcube.model.Face, Character> bindings = new java.util.HashMap<>();
+        String sql = "SELECT key, value FROM metadata WHERE key LIKE 'KEY_%'";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String k = rs.getString("key");
+                String v = rs.getString("value");
+                if (v != null && !v.isEmpty()) {
+                    try {
+                        String faceName = k.substring(4); // Remove "KEY_"
+                        com.colorcube.model.Face face = com.colorcube.model.Face.valueOf(faceName);
+                        bindings.put(face, v.charAt(0));
+                    } catch (IllegalArgumentException e) {
+                        // Ignore invalid face names
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bindings;
+    }
 }
