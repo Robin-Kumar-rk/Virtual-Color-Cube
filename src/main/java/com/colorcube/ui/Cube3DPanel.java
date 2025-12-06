@@ -1,6 +1,7 @@
 package com.colorcube.ui;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -398,13 +399,28 @@ public class Cube3DPanel extends JPanel {
         Point3D p0 = project(q.verts[0]);
         path.moveTo(cx + p0.x, cy + p0.y);
 
+        Point3D p2 = null;
+
         for (int i = 1; i < 4; i++) {
             Point3D p = project(q.verts[i]);
             path.lineTo(cx + p.x, cy + p.y);
+            if (i == 2)
+                p2 = p;
         }
         path.closePath();
 
-        g2.setColor(q.color);
+        // Shine using GradientPaint from top-left (p0) to bottom-right (p2)
+        if (p2 != null) {
+            // Brighter color for shine
+            Color c1 = q.color.brighter();
+            GradientPaint gp = new GradientPaint(
+                    (float) (cx + p0.x), (float) (cy + p0.y), c1,
+                    (float) (cx + p2.x), (float) (cy + p2.y), q.color);
+            g2.setPaint(gp);
+        } else {
+            g2.setColor(q.color);
+        }
+
         g2.fill(path);
         g2.setColor(Color.BLACK);
         g2.draw(path);
