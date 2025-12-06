@@ -51,23 +51,33 @@ This project uses SQLite for saving progress. You need to download the SQLite JD
 
 ## Features
 
-- **3D Visualization**: Interactive 3D cube that can be rotated and zoomed.
-- **Solid Cubies**: Realistic rendering with 27 individual cubies and black internal faces.
-- **Move Animation**: Smooth animations for face rotations.
-- **2D Net View**: Real-time flattened view of the cube state.
+- **3D Visualization**: Interactive 3D cube with smooth rotation and zoom.
+- **Visual Polish**: Solid cubies with a "shine" effect and realistic internal faces.
+- **Move Animation**: Smooth animations for all face rotations.
+- **2D Net View**: Real-time flattened view with distinct face borders for easier orientation.
 - **Scramble Generator**: Generates random legal scrambles for practice.
-- **Persistence**: Save and load your practice sessions.
-- **Keyboard Controls**: Standard notation support (R, L, U, D, F, B) and Undo (Ctrl+Z).
+- **Persistence**: 
+    - Save and Load practice sessions using SQLite.
+    - Toggleable "Saved Progress" pane for better screen space management.
+- **App Layout**: Optimized layout with 60/40 split for 3D/2D views.
+- **Custom Controls**: 
+    - Global keyboard shortcuts (R, L, U, D, F, B).
+    - Customizable keys: Click any face in 2D view to assign a custom key.
+    - Key bindings are persisted across restarts.
 
 ## Controls
 
-- **Mouse**: Drag to rotate view, Scroll to zoom.
+- **Mouse**: 
+    - Left Click & Drag: Rotate 3D view.
+    - Scroll: Zoom in/out.
 - **Keyboard**:
     - `R`, `L`, `U`, `D`, `F`, `B`: Clockwise moves.
     - `Shift` + Key: Counter-clockwise moves.
-    - `Ctrl + Z`: Undo.
-- **Buttons**:
-    - **New Scramble**: Scramble the cube.
+    - `Ctrl + Z`: Undo last move.
+- **UI Interaction**:
+    - **New Scramble**: Apply a random 20-move scramble.
     - **Reset**: Return to solved state.
-    - **Save Progress**: Save current state.
-    - **Load**: Load a saved session.
+    - **Save Progress**: Save current state as a new session.
+    - **Saved Progress (Toggle)**: Show/Hide the saved sessions list on the right.
+    - **Load/Delete**: Use buttons in the saved list to manage sessions.
+    - **Assign Keys**: Click center of any face in 2D view to set a custom key.
