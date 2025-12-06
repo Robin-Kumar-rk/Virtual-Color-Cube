@@ -122,6 +122,13 @@ public class CubeNetPanel extends JPanel {
                 }
             }
         }
+
+        // Draw thick border around the whole face
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new java.awt.BasicStroke(3));
+        g2.setColor(Color.BLACK);
+        g2.drawRect(baseX, baseY, 3 * cellSize, 3 * cellSize);
+        g2.setStroke(new java.awt.BasicStroke(1)); // Reset
     }
 
     private Color getColor(char code) {
