@@ -137,7 +137,7 @@ public class CubeNetPanel extends JPanel {
             case 'O':
                 return new Color(255, 165, 0);
             case 'B':
-                return Color.BLUE;
+                return new Color(30, 144, 255);
             default:
                 return Color.GRAY;
         }

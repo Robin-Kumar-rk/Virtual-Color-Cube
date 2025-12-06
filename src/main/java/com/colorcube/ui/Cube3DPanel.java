@@ -387,7 +387,7 @@ public class Cube3DPanel extends JPanel {
             case 'O':
                 return new Color(255, 165, 0); // Orange
             case 'B':
-                return Color.BLUE;
+                return new Color(30, 144, 255);
             default:
                 return Color.GRAY;
         }
