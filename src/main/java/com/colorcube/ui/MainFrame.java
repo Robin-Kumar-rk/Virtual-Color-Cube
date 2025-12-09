@@ -57,7 +57,6 @@ public class MainFrame extends JFrame {
         model = new CubeModel();
         dbManager = new DBManager();
 
-        // Initialize default key bindings
         // Initialize key bindings from DB or defaults
         faceKeys = dbManager.loadKeyBindings();
 
@@ -83,7 +82,6 @@ public class MainFrame extends JFrame {
         innerSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel3D, panelNet);
         innerSplitPane.setResizeWeight(0.6); // 60/40 default when saved pane is hidden
 
-        // Right: Saved Progress
         // Right: Saved Progress
         rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(new JLabel("Saved Progress"), BorderLayout.NORTH);
@@ -231,7 +229,7 @@ public class MainFrame extends JFrame {
             return;
         String name = JOptionPane.showInputDialog(this, "Enter name for this session:");
         if (name != null && !name.trim().isEmpty()) {
-            dbManager.saveProgress(name, model.getFaceletString(), "", 0, false, null);
+            dbManager.saveProgress(name, model.getFaceletString());
             refreshSavedList();
             JOptionPane.showMessageDialog(this, "Saved successfully!");
         }
