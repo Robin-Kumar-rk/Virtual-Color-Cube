@@ -24,10 +24,6 @@ public class DBManager {
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "name TEXT NOT NULL," +
                     "facelet_string TEXT NOT NULL," +
-                    "move_history TEXT," +
-                    "elapsed_ms INTEGER DEFAULT 0," +
-                    "is_user_filled BOOLEAN DEFAULT 0," +
-                    "thumbnail BLOB," +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                     ");";
             stmt.execute(sql);
@@ -45,17 +41,13 @@ public class DBManager {
     }
 
     public void saveProgress(String name, String facelets) {
-        String sql = "INSERT INTO saved_progress(name, facelet_string, move_history, elapsed_ms, is_user_filled, thumbnail) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO saved_progress(name, facelet_string) VALUES(?,?)";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, name);
             pstmt.setString(2, facelets);
-            pstmt.setString(3, ""); // Default empty history
-            pstmt.setLong(4, 0); // Default 0 elapsed
-            pstmt.setBoolean(5, false); // Default false
-            pstmt.setBytes(6, null); // Default null thumbnail
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
