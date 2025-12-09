@@ -8,7 +8,6 @@ public class CubeModel {
     // U: 0-8, R: 9-17, F: 18-26, D: 27-35, L: 36-44, B: 45-53
     private char[] facelets;
     private final Stack<Move> moveHistory;
-    private final Stack<Move> redoStack;
 
     // Solved state colors (standard scheme)
     // U=White(W), R=Red(R), F=Green(G), D=Yellow(Y), L=Orange(O), B=Blue(B)
@@ -18,14 +17,12 @@ public class CubeModel {
     public CubeModel() {
         this.facelets = new char[54];
         this.moveHistory = new Stack<>();
-        this.redoStack = new Stack<>();
         reset();
     }
 
     public void reset() {
         setFacelets(SOLVED_STATE);
         moveHistory.clear();
-        redoStack.clear();
     }
 
     public void setFacelets(String state) {
@@ -42,7 +39,6 @@ public class CubeModel {
     public void applyMove(Move move) {
         performRotation(move);
         moveHistory.push(move);
-        redoStack.clear(); // Clear redo stack on new move
     }
 
     public void undo() {
@@ -50,15 +46,6 @@ public class CubeModel {
             Move move = moveHistory.pop();
             Move inverse = getInverse(move);
             performRotation(inverse);
-            redoStack.push(move);
-        }
-    }
-
-    public void redo() {
-        if (!redoStack.isEmpty()) {
-            Move move = redoStack.pop();
-            performRotation(move);
-            moveHistory.push(move);
         }
     }
 

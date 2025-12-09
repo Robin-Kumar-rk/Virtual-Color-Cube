@@ -33,12 +33,4 @@ public class Scrambler {
         }
         return scramble;
     }
-
-    public static String getScrambleString(List<Move> scramble) {
-        StringBuilder sb = new StringBuilder();
-        for (Move m : scramble) {
-            sb.append(m.getNotation()).append(" ");
-        }
-        return sb.toString().trim();
-    }
 }
