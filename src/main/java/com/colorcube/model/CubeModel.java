@@ -57,8 +57,6 @@ public class CubeModel {
 
     public Move getInverse(Move m) {
         String n = m.getNotation();
-        if (n.endsWith("2"))
-            return m; // Inverse of U2 is U2
         if (n.endsWith("'"))
             return Move.fromString(n.substring(0, 1)); // U' -> U
         return Move.fromString(n + "'"); // U -> U'
@@ -67,10 +65,7 @@ public class CubeModel {
     // Core rotation logic
     private void performRotation(Move move) {
         int turns = move.getDir();
-        if (turns == 2) {
-            rotateFace(move.getFace(), 1);
-            rotateFace(move.getFace(), 1);
-        } else if (turns == -1) {
+        if (turns == -1) {
             rotateFace(move.getFace(), 3); // 3 clockwise = 1 counter-clockwise
         } else {
             rotateFace(move.getFace(), 1);

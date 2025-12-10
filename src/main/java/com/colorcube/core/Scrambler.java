@@ -10,7 +10,7 @@ import com.colorcube.model.Move;
 public class Scrambler {
     private static final Random random = new Random();
     private static final Face[] FACES = Face.values();
-    private static final String[] SUFFIXES = { "", "'", "2" };
+    private static final String[] SUFFIXES = { "", "'" };
 
     public static List<Move> generateScramble(int length) {
         List<Move> scramble = new ArrayList<>();
