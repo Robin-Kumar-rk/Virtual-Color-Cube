@@ -177,8 +177,7 @@ public class MainFrame extends JFrame {
                 "- Reset: Click 'Reset'.\n\n" +
                 "Keyboard Shortcuts:\n" +
                 "- R, L, U, D, F, B: Clockwise rotations.\n" +
-                "- Shift + Key: Counter-clockwise (Prime) rotations.\n" +
-                "- Ctrl + Z: Undo.\n\n" +
+                "- Ctrl + Z: Undo (Performs Anti-Clockwise Rotation).\n\n" +
                 "Custom Keys:\n" +
                 "- Click the center of any face in the 2D view to assign a custom key.\n\n" +
                 "Sessions:\n" +

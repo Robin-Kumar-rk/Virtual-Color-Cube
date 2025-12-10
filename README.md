@@ -72,8 +72,7 @@ This project uses SQLite for saving progress. You need to download the SQLite JD
     - Scroll: Zoom in/out.
 - **Keyboard**:
     - `R`, `L`, `U`, `D`, `F`, `B`: Clockwise moves.
-    - `Shift` + Key: Counter-clockwise moves.
-    - `Ctrl + Z`: Undo last move.
+    - `Ctrl + Z`: Undo last move (Anti-Clockwise).
 - **UI Interaction**:
     - **New Scramble**: Apply a random 20-move scramble.
     - **Reset**: Return to solved state.
