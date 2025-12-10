@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import com.colorcube.model.Face;
 
 public class DBManager {
     private static final String DB_URL = "jdbc:sqlite:cube_practice.db";
@@ -103,7 +106,7 @@ public class DBManager {
         }
     }
 
-    public void saveKeyBinding(com.colorcube.model.Face face, char key) {
+    public void saveKeyBinding(Face face, char key) {
         String k = "KEY_" + face.name();
         String v = String.valueOf(key);
         String sql = "INSERT OR REPLACE INTO metadata(key, value) VALUES(?, ?)";
@@ -118,8 +121,8 @@ public class DBManager {
         }
     }
 
-    public java.util.Map<com.colorcube.model.Face, Character> loadKeyBindings() {
-        java.util.Map<com.colorcube.model.Face, Character> bindings = new java.util.HashMap<>();
+    public Map<Face, Character> loadKeyBindings() {
+        Map<Face, Character> bindings = new HashMap<>();
         String sql = "SELECT key, value FROM metadata WHERE key LIKE 'KEY_%'";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -132,7 +135,7 @@ public class DBManager {
                 if (v != null && !v.isEmpty()) {
                     try {
                         String faceName = k.substring(4); // Remove "KEY_"
-                        com.colorcube.model.Face face = com.colorcube.model.Face.valueOf(faceName);
+                        Face face = Face.valueOf(faceName);
                         bindings.put(face, v.charAt(0));
                     } catch (IllegalArgumentException e) {
                         // Ignore invalid face names

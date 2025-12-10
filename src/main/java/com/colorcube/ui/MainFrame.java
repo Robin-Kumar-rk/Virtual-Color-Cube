@@ -27,6 +27,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.Font;
 
 import com.colorcube.core.Scrambler;
 import com.colorcube.model.CubeModel;
@@ -185,7 +187,7 @@ public class MainFrame extends JFrame {
         JOptionPane.showMessageDialog(this, helpText, "Help & Instructions", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private JButton createStyledButton(String text, java.awt.event.ActionListener action) {
+    private JButton createStyledButton(String text, ActionListener action) {
         JButton btn = new JButton(text);
         btn.addActionListener(action);
         btn.setFocusPainted(false);
@@ -272,7 +274,7 @@ public class MainFrame extends JFrame {
             row.setPreferredSize(new Dimension(300, 65));
 
             JLabel lblName = new JLabel("  " + s.toString());
-            lblName.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+            lblName.setFont(new Font("Segoe UI", Font.BOLD, 12));
             // Name at top
             row.add(lblName, BorderLayout.NORTH);
 
@@ -283,14 +285,14 @@ public class MainFrame extends JFrame {
             JButton btnRestore = new JButton("Load");
             btnRestore.setToolTipText("Load this session");
             btnRestore.setMargin(new java.awt.Insets(2, 8, 2, 8));
-            btnRestore.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 11));
+            btnRestore.setFont(new Font("Segoe UI", Font.PLAIN, 11));
             btnRestore.addActionListener(e -> doLoad(s));
 
             JButton btnDelete = new JButton("Delete");
             btnDelete.setToolTipText("Delete this session");
             btnDelete.setMargin(new java.awt.Insets(2, 8, 2, 8));
             btnDelete.setForeground(Color.RED);
-            btnDelete.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
+            btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 11));
             btnDelete.addActionListener(e -> doDelete(s));
 
             btnPanel.add(btnRestore);
