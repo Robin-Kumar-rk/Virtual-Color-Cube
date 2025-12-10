@@ -326,9 +326,12 @@ public class MainFrame extends JFrame {
                 if (panel3D.isAnimating())
                     return;
 
-                if (model.getLastMove() != null) {
-                    model.undo();
-                    refreshViews();
+                Move lastMove = model.getLastMove();
+                if (lastMove != null) {
+                    panel3D.animateUndo(lastMove, () -> {
+                        model.undo();
+                        refreshViews();
+                    });
                 }
             }
         });

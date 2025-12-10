@@ -32,6 +32,7 @@ public class Cube3DPanel extends JPanel {
 
     // Animation state
     private Move currentMove;
+    private boolean isUndo = false;
     private double animProgress; // 0.0 to 1.0
     private Timer animTimer;
     private Runnable onAnimComplete;
@@ -84,7 +85,24 @@ public class Cube3DPanel extends JPanel {
         this.currentMove = move;
         this.onAnimComplete = onComplete;
         this.animProgress = 0;
+        this.isUndo = false;
 
+        startAnimation();
+    }
+
+    public void animateUndo(Move move, Runnable onComplete) {
+        if (animTimer != null && animTimer.isRunning())
+            return;
+
+        this.currentMove = move;
+        this.onAnimComplete = onComplete;
+        this.animProgress = 0;
+        this.isUndo = true;
+
+        startAnimation();
+    }
+
+    private void startAnimation() {
         animTimer = new Timer(15, new ActionListener() {
             long startTime = -1;
 
@@ -99,6 +117,7 @@ public class Cube3DPanel extends JPanel {
                     animProgress = 1.0;
                     animTimer.stop();
                     currentMove = null;
+                    isUndo = false;
                     if (onAnimComplete != null)
                         onAnimComplete.run();
                 }
@@ -305,6 +324,9 @@ public class Cube3DPanel extends JPanel {
     private Point3D applyAnimationTransform(Point3D p) {
         // Apply rotation
         double angle = 90.0 * animProgress;
+        if (isUndo)
+            angle = -angle;
+
         // Axis of rotation
         double ax = 0, ay = 0, az = 0;
         switch (currentMove.getFace()) {
@@ -331,22 +353,22 @@ public class Cube3DPanel extends JPanel {
         // Fix angles based on previous derivation
         switch (currentMove.getFace()) {
             case U:
-                angle = -90.0 * animProgress;
+                angle *= -1;
                 break;
             case D:
-                angle = 90.0 * animProgress;
+                angle *= 1;
                 break;
             case R:
-                angle = 90.0 * animProgress;
+                angle *= 1;
                 break;
             case L:
-                angle = -90.0 * animProgress;
+                angle *= -1;
                 break;
             case F:
-                angle = 90.0 * animProgress;
+                angle *= 1;
                 break;
             case B:
-                angle = -90.0 * animProgress;
+                angle *= -1;
                 break;
         }
 
