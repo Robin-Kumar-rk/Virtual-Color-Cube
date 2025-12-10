@@ -56,10 +56,15 @@ public class CubeModel {
     }
 
     public Move getInverse(Move m) {
-        String n = m.getNotation();
-        if (n.endsWith("'"))
-            return Move.fromString(n.substring(0, 1)); // U' -> U
-        return Move.fromString(n + "'"); // U -> U'
+        Face f = m.getFace();
+        int d = m.getDir();
+        // Find move with same face and opposite direction
+        for (Move inv : Move.values()) {
+            if (inv.getFace() == f && inv.getDir() == -d) {
+                return inv;
+            }
+        }
+        return m; // Should not happen for valid moves
     }
 
     // Core rotation logic
