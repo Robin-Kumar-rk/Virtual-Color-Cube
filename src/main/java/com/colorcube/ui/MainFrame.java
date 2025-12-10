@@ -204,8 +204,6 @@ public class MainFrame extends JFrame {
         // Remove old keystrokes from InputMap
         content.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .remove(KeyStroke.getKeyStroke(Character.toUpperCase(oldKey), 0));
-        content.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .remove(KeyStroke.getKeyStroke(Character.toUpperCase(oldKey), KeyEvent.SHIFT_DOWN_MASK));
 
         // Update map
         faceKeys.put(face, newKey);
@@ -328,13 +326,9 @@ public class MainFrame extends JFrame {
                 if (panel3D.isAnimating())
                     return;
 
-                Move lastMove = model.getLastMove();
-                if (lastMove != null) {
-                    Move inverse = model.getInverse(lastMove);
-                    panel3D.animateMove(inverse, () -> {
-                        model.undo();
-                        refreshViews();
-                    });
+                if (model.getLastMove() != null) {
+                    model.undo();
+                    refreshViews();
                 }
             }
         });
@@ -357,23 +351,6 @@ public class MainFrame extends JFrame {
                     return;
                 panel3D.animateMove(move, () -> {
                     model.applyMove(move);
-                    refreshViews();
-                });
-            }
-        });
-
-        // Prime Move (Counter-Clockwise)
-        Move movePrime = Move.valueOf(face.name() + "_PRIME");
-        String namePrime = movePrime.toString();
-        c.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode, KeyEvent.SHIFT_DOWN_MASK),
-                namePrime);
-        c.getActionMap().put(namePrime, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (panel3D.isAnimating())
-                    return;
-                panel3D.animateMove(movePrime, () -> {
-                    model.applyMove(movePrime);
                     refreshViews();
                 });
             }

@@ -304,7 +304,7 @@ public class Cube3DPanel extends JPanel {
 
     private Point3D applyAnimationTransform(Point3D p) {
         // Apply rotation
-        double angle = 90.0 * currentMove.getDir() * animProgress;
+        double angle = 90.0 * animProgress;
         // Axis of rotation
         double ax = 0, ay = 0, az = 0;
         switch (currentMove.getFace()) {
@@ -331,22 +331,22 @@ public class Cube3DPanel extends JPanel {
         // Fix angles based on previous derivation
         switch (currentMove.getFace()) {
             case U:
-                angle = -90.0 * currentMove.getDir() * animProgress;
+                angle = -90.0 * animProgress;
                 break;
             case D:
-                angle = 90.0 * currentMove.getDir() * animProgress;
+                angle = 90.0 * animProgress;
                 break;
             case R:
-                angle = 90.0 * currentMove.getDir() * animProgress;
+                angle = 90.0 * animProgress;
                 break;
             case L:
-                angle = -90.0 * currentMove.getDir() * animProgress;
+                angle = -90.0 * animProgress;
                 break;
             case F:
-                angle = 90.0 * currentMove.getDir() * animProgress;
+                angle = 90.0 * animProgress;
                 break;
             case B:
-                angle = -90.0 * currentMove.getDir() * animProgress;
+                angle = -90.0 * animProgress;
                 break;
         }
 

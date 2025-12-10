@@ -44,8 +44,10 @@ public class CubeModel {
     public void undo() {
         if (!moveHistory.isEmpty()) {
             Move move = moveHistory.pop();
-            Move inverse = getInverse(move);
-            performRotation(inverse);
+            // Inverse of a clockwise move is 3 clockwise moves
+            performRotation(move);
+            performRotation(move);
+            performRotation(move);
         }
     }
 
@@ -55,26 +57,10 @@ public class CubeModel {
         return moveHistory.peek();
     }
 
-    public Move getInverse(Move m) {
-        Face f = m.getFace();
-        int d = m.getDir();
-        // Find move with same face and opposite direction
-        for (Move inv : Move.values()) {
-            if (inv.getFace() == f && inv.getDir() == -d) {
-                return inv;
-            }
-        }
-        return m; // Should not happen for valid moves
-    }
-
     // Core rotation logic
     private void performRotation(Move move) {
-        int turns = move.getDir();
-        if (turns == -1) {
-            rotateFace(move.getFace(), 3); // 3 clockwise = 1 counter-clockwise
-        } else {
-            rotateFace(move.getFace(), 1);
-        }
+        // Always 1 clockwise turn
+        rotateFace(move.getFace(), 1);
     }
 
     private void rotateFace(Face face, int times) {
