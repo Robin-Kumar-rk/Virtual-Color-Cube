@@ -60,13 +60,7 @@ public class CubeModel {
     // Core rotation logic
     private void performRotation(Move move) {
         // Always 1 clockwise turn
-        rotateFace(move.getFace(), 1);
-    }
-
-    private void rotateFace(Face face, int times) {
-        for (int i = 0; i < times; i++) {
-            rotateFaceClockwise(face);
-        }
+        rotateFaceClockwise(move.getFace());
     }
 
     private void rotateFaceClockwise(Face face) {
