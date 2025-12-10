@@ -188,17 +188,11 @@ public class CubeModel {
         for (int i = 0; i < 3; i++)
             temp[i] = facelets[adj[0][i]];
 
-        // adj[0] = adj[1]
-        for (int i = 0; i < 3; i++)
-            facelets[adj[0][i]] = facelets[adj[1][i]];
-
-        // adj[1] = adj[2]
-        for (int i = 0; i < 3; i++)
-            facelets[adj[1][i]] = facelets[adj[2][i]];
-
-        // adj[2] = adj[3]
-        for (int i = 0; i < 3; i++)
-            facelets[adj[2][i]] = facelets[adj[3][i]];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                facelets[adj[i][j]] = facelets[adj[i + 1][j]];
+            }
+        }
 
         // adj[3] = temp
         for (int i = 0; i < 3; i++)
