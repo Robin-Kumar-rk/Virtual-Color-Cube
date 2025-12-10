@@ -25,10 +25,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-
+import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.Font;
+import java.awt.Image;
 
 import com.colorcube.core.Scrambler;
 import com.colorcube.model.CubeModel;
@@ -51,11 +52,11 @@ public class MainFrame extends JFrame {
     private Map<Face, Character> faceKeys;
 
     public MainFrame() {
-        super("3x3 Color Cube - Virtual Practice");
+        super("Virtual Color Cube");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 600); // Reduced height to prevent taskbar overlap
         setLocationRelativeTo(null);
-
+        setIconImage(new ImageIcon("src/main/resources/cube.png").getImage());
         model = new CubeModel();
         dbManager = new DBManager();
 
@@ -262,6 +263,12 @@ public class MainFrame extends JFrame {
     private void refreshSavedList() {
         savedItemsPanel.removeAll();
         List<DBManager.SavedSession> sessions = dbManager.loadAllProgress();
+        ImageIcon restoreIcon = new ImageIcon("src/main/resources/restore.png");
+        ImageIcon scaledRestoreIcon = new ImageIcon(
+            restoreIcon.getImage().getScaledInstance(14, 14, Image.SCALE_SMOOTH));
+        ImageIcon deleteIcon = new ImageIcon("src/main/resources/delete.png");
+        ImageIcon scaledDeleteIcon = new ImageIcon(
+            deleteIcon.getImage().getScaledInstance(14, 14, Image.SCALE_SMOOTH));
         for (DBManager.SavedSession s : sessions) {
             JPanel row = new JPanel(new BorderLayout());
             row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
@@ -283,6 +290,8 @@ public class MainFrame extends JFrame {
             btnRestore.setToolTipText("Load this session");
             btnRestore.setMargin(new java.awt.Insets(2, 8, 2, 8));
             btnRestore.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            btnRestore.setIcon(scaledRestoreIcon);
+            
             btnRestore.addActionListener(e -> doLoad(s));
 
             JButton btnDelete = new JButton("Delete");
@@ -290,6 +299,7 @@ public class MainFrame extends JFrame {
             btnDelete.setMargin(new java.awt.Insets(2, 8, 2, 8));
             btnDelete.setForeground(Color.RED);
             btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            btnDelete.setIcon(scaledDeleteIcon);
             btnDelete.addActionListener(e -> doDelete(s));
 
             btnPanel.add(btnRestore);
