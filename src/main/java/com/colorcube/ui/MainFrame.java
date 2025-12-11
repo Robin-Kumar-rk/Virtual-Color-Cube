@@ -353,7 +353,7 @@ public class MainFrame extends JFrame {
             keyCode = (int) Character.toUpperCase(key);
 
         // Move (Clockwise)
-        Move move = Move.valueOf(face.name());
+        Move move = Move.fromString(face.toString());
         String name = move.toString();
         c.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode, 0), name);
         c.getActionMap().put(name, new AbstractAction() {
