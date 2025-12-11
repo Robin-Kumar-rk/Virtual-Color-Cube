@@ -107,7 +107,7 @@ public class DBManager {
     }
 
     public void saveKeyBinding(Face face, char key) {
-        String k = "KEY_" + face.name();
+        String k = face.toString();
         String v = String.valueOf(key);
         String sql = "INSERT OR REPLACE INTO metadata(key, value) VALUES(?, ?)";
 
@@ -123,7 +123,7 @@ public class DBManager {
 
     public Map<Face, Character> loadKeyBindings() {
         Map<Face, Character> bindings = new HashMap<>();
-        String sql = "SELECT key, value FROM metadata WHERE key LIKE 'KEY_%'";
+        String sql = "SELECT key, value FROM metadata";
 
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 Statement stmt = conn.createStatement();
@@ -134,8 +134,7 @@ public class DBManager {
                 String v = rs.getString("value");
                 if (v != null && !v.isEmpty()) {
                     try {
-                        String faceName = k.substring(4); // Remove "KEY_"
-                        Face face = Face.valueOf(faceName);
+                        Face face = Face.valueOf(k);
                         bindings.put(face, v.charAt(0));
                     } catch (IllegalArgumentException e) {
                         // Ignore invalid face names
